@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>au.id.deejay</groupId>
+    <groupId>com.foxesworld.webserver</groupId>
     <artifactId>java-webserver</artifactId>
     <version>1.0.0</version>
 
@@ -57,24 +57,6 @@
                 </executions>
             </plugin>
 
-            <!-- Generate javadoc JAR -->
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <quiet>true</quiet>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Require Java 8 and Maven 3+ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -113,27 +95,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Validate against Checkstyle rules -->
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.17</version>
-                <configuration>
-                    <configLocation>${project.basedir}/checkstyle-rules.xml</configLocation>
-                    <failOnViolation>true</failOnViolation>
-                    <failsOnError>true</failsOnError>
-                    <consoleOutput>true</consoleOutput>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>check</id>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <phase>process-classes</phase>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
 
     </build>
@@ -158,6 +119,11 @@
             <artifactId>awaitility</artifactId>
             <version>2.0.0</version>
             <scope>test</scope>
+        </dependency>
+         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.12.6.1</version>
         </dependency>
 
         <!-- Logging -->

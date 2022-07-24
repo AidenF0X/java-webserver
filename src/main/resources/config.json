@@ -1,0 +1,6 @@
+{
+    "port": 8080,
+    "htdocs": "./www",
+    "maxThreads": 20,
+    "defaultTimeout": 10
+}
