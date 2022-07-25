@@ -2,7 +2,6 @@ package webserver;
 
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import webserver.handler.DocrootHandler;
 import webserver.handler.ServerInfoHandler;
 import webserver.server.WebServer;
@@ -22,29 +21,20 @@ import webserver.handler.TesHandler;
 public class App {
 
 	private static final Logger LOG = LoggerFactory.getLogger(App.class);
-        public static ConfigUtils config;
-        public static ConfigUtils cftes;
-        public static ConfigOptions cfo;
+        protected static ConfigUtils config;
+        protected static ConfigOptions cfo;
         private static final String cfgName = "main.cfg";
-        private static final String cfgPath = "config" + File.separator + cfgName;
-	private App() {}
+        protected static final String cfgPath = "config" + File.separator + cfgName;
+        protected static final String cfgTemplate = "config.json";
+	
+        protected App() {}
 
-	/**
-	 * Main application loop. Parses the command line args then tries to start a server instance.
-	 *
-	 * @param args String array of command line arguments
-	 */
-	public static void main(String[] args) {
-                config = new ConfigUtils(new File(getWorkdir(3) + cfgPath), "config.json"){};
-                config.load();
-                cfo = new ConfigOptions();
-               
-                /*
-                cftes = new ConfigUtils(new File(getWorkdir(3) + "config" + File.separator + "gg.cfg"), "tes.json"){};
-                cftes.load(); */
-		CommandLineOptions options = new CommandLineOptions(args);
+	public static void main(String[] args) throws IOException {
+                config = new ConfigUtils(new File(getWorkdir(3) + cfgPath), cfgTemplate){};
+                cfo = new ConfigOptions(config);
 
-		// If the help options is set, print usage and exit.
+                CommandLineOptions options = new CommandLineOptions(args);
+
 		if (options.help()) {
 			printUsage();
 			return;

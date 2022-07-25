@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static webserver.App.config;
 
 /**
  *
@@ -21,16 +20,17 @@ public class ConfigOptions {
     
     private static ConfigUtils configInstance;
     
-    public ConfigOptions(){
-        //this.configInstance = configInstance;
+    public ConfigOptions(ConfigUtils configInstance) throws IOException{
+       ConfigOptions.configInstance = configInstance;
+       setDefaults();
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfigOptions.class);
     
-    public static void setDefaults(File classFullPath, String jsonFile) throws IOException {
-            LOG.info("  - Filling " + classFullPath + " file, with " + jsonFile + " contents");
+    public static void setDefaults() throws IOException {
+            LOG.info("  - Filling " + ConfigUtils.classFullPath + " file, with " + ConfigUtils.cfgTemplate + " contents");
             ObjectMapper mapper = new ObjectMapper(); 
-            InputStream is = getResourceAsStream(jsonFile);
+            InputStream is = getResourceAsStream(ConfigUtils.cfgTemplate);
             TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
             HashMap<String,Object> map = mapper.readValue(is, typeRef); 
  
@@ -39,34 +39,36 @@ public class ConfigOptions {
                     Object value = entry.getValue();
                     setProperty(key, value);
             }
-                setProperty("created", new Date());
+            setProperty("created", new Date());
     }  
     
     public static void setProperty(String key, Object value) {
-		if (config.checkProperty(key)) {
+		if (configInstance.checkProperty(key)) {
 			//config.changeProperty(key, value);
                 } else {
-			config.put(key, value);
+			configInstance.put(key, value);
                         LOG.info("  - Recording a missing key `" + key + "` with value `"+ value + "`");
                 }
 	}
 
 	public static String getPropertyString(String key) {
-		if (config.checkProperty(key))
-			return config.getPropertyString(key);
+		if (configInstance.checkProperty(key)) {
+			return configInstance.getPropertyString(key);
+                }
 		return null;
 	}
 
 	public static boolean getPropertyBoolean(String key) {
-		if (config.checkProperty(key)) {
-			return config.getPropertyBoolean(key);
+		if (configInstance.checkProperty(key)) {
+			return configInstance.getPropertyBoolean(key);
                 }
 		return false;
 	}
 
 	public static int getPropertyInt(String key) {
-		if (config.checkProperty(key))
-			return config.getPropertyInteger(key);
+		if (configInstance.checkProperty(key)) {
+			return configInstance.getPropertyInteger(key);
+                }
 		return 0;
 	}
         /*
@@ -81,8 +83,9 @@ public class ConfigOptions {
 	} */
 
 	public static boolean getPropertyBoolean(String key, boolean value) {
-		if (config.checkProperty(key))
-			return config.getPropertyBoolean(key);
+		if (configInstance.checkProperty(key)) {
+			return configInstance.getPropertyBoolean(key);
+                }
 		return value;
 	}
         

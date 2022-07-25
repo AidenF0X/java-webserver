@@ -11,16 +11,19 @@ import java.io.InputStream;
 import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.App;
 
 /**
  *
  * @author AidenFox
  */
 
-public abstract class ConfigUtils {
+public abstract class ConfigUtils extends App {
+    
 	/*INPUT*/
-        public final File classFullPath;
-        public final String cfgTemplate;
+            public static File classFullPath;
+            public static String cfgTemplate;
+        /*INPUT*/
         
         
 	private Boolean cached = false;
@@ -29,8 +32,9 @@ public abstract class ConfigUtils {
         private static final Logger LOG = LoggerFactory.getLogger(ConfigUtils.class);
 
 	public ConfigUtils(File fullPath, String cfgTemplate) {
-		this.classFullPath = fullPath;
-                this.cfgTemplate = cfgTemplate;
+		ConfigUtils.classFullPath = fullPath;
+                ConfigUtils.cfgTemplate = cfgTemplate;
+                this.load();
 	}
 
 	public Boolean isCached() {
@@ -45,7 +49,7 @@ public abstract class ConfigUtils {
 	}
         
         public void load() {
-            LOG.info("Loading config "+classFullPath);
+            LOG.info("Loading " + classFullPath);
 		if (!classFullPath.exists()){
                     create();
                     LOG.info("  - Creating " + classFullPath);
@@ -56,9 +60,6 @@ public abstract class ConfigUtils {
 		if (cached){
 			cache = this.loadHashMap();
                 }
-                try {
-                    ConfigOptions.setDefaults(classFullPath, cfgTemplate);
-                } catch (IOException ex) {}
 	}
 
 	private void create() {
