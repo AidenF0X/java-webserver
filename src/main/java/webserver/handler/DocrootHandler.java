@@ -12,6 +12,8 @@ import webserver.response.RedirectResponse;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A request handler which handles GET requests by serving files from within a folder.
@@ -26,6 +28,7 @@ public class DocrootHandler implements RequestHandler {
 	private final File docroot;
 	private final List<String> indexFiles;
 	private final Boolean allowDirectoryListings;
+        private static final Logger LOG = LoggerFactory.getLogger(DocrootHandler.class);
 
 	/**
 	 * Creates a new handler serving files from the path provided. If a list of index file names is provided then when a
@@ -62,8 +65,11 @@ public class DocrootHandler implements RequestHandler {
 		this.allowDirectoryListings = allowDirectoryListings;
 
 		if (!this.docroot.canRead()) {
-			throw new IllegalStateException("Unable to read docroot: " + docroot.getPath());
-		}
+                        this.docroot.mkdirs();
+                        LOG.info("Creating "+docroot.getPath()+" workdir");
+		} else {
+                     LOG.info("Reading "+docroot.getPath()+" workdir");
+                }
 
 		if (!this.docroot.isDirectory()) {
 			throw new IllegalArgumentException(docroot.getPath() + " is not a directory");

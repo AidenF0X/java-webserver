@@ -47,19 +47,14 @@ public class App {
 		int timeout = options.timeout();
 		int maxThreads = options.maxThreads();
 		String docroot = options.docroot();
-
 		// Configure request handlers
 		RequestHandler serverInfoHandler = new ServerInfoHandler(port, timeout, maxThreads, docroot, System.currentTimeMillis());
-		RequestHandler docrootHandler = new DocrootHandler(docroot, Collections.singletonList("index.html"), true);
-
+		RequestHandler docrootHandler = new DocrootHandler(docroot, Collections.singletonList(cfo.getPropertyString("indexFile")), cfo.getPropertyBoolean("directoryListing"));
 		List<RequestHandler> requestHandlers = Arrays.asList(serverInfoHandler, docrootHandler);
-
 		// Create the server
 		WebServer server = new WebServer(port, timeout, maxThreads, requestHandlers);
-
 		// Register a shutdown hook to gracefully stop the server when the JVM is terminated
 		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook(server)));
-
 		// Start the server
 		server.start();
 	}
