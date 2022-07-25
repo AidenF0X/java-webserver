@@ -3,7 +3,6 @@ package webserver.config;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -19,32 +18,19 @@ import org.slf4j.LoggerFactory;
  */
 
 public abstract class ConfigUtils {
-	private File out;
+	/*INPUT*/
+        public final File classFullPath;
+        public final String cfgTemplate;
+        
+        
 	private Boolean cached = false;
-	private String filename = null;
 	private HashMap<String, String> cache;
 	private InputStream input = null;
         private static final Logger LOG = LoggerFactory.getLogger(ConfigUtils.class);
 
-	public ConfigUtils(String filename, String out) {
-		this.filename = filename;
-		this.out = new File(out);
-	}
-
-	public ConfigUtils(String filename, File out) {
-		this.filename = filename;
-		this.out = out;
-	}
-
-	public ConfigUtils(InputStream input, File out) {
-		this.input = input;
-		this.out = out;
-	}
-
-	public ConfigUtils(File out) throws FileNotFoundException {
-		if (!out.exists())
-			throw new FileNotFoundException("-");
-		this.out = out;
+	public ConfigUtils(File fullPath, String cfgTemplate) {
+		this.classFullPath = fullPath;
+                this.cfgTemplate = cfgTemplate;
 	}
 
 	public Boolean isCached() {
@@ -59,31 +45,27 @@ public abstract class ConfigUtils {
 	}
         
         public void load() {
-            LOG.info("Loading config...");
-		if (filename != null && !out.exists()){
-                    create(filename);
-                    LOG.info("  - Creating " + filename);
-
+            LOG.info("Loading config "+classFullPath);
+		if (!classFullPath.exists()){
+                    create();
+                    LOG.info("  - Creating " + classFullPath);
                 } else {
                     LOG.info("  - Config file exists "+getLineCount()+" lines");
                 }
-		if (input != null && !out.exists())
-			create(input);
+
 		if (cached){
 			cache = this.loadHashMap();
                 }
                 try {
-                    ConfigOptions.setDefaults("config.json");
+                    ConfigOptions.setDefaults(classFullPath, cfgTemplate);
                 } catch (IOException ex) {}
 	}
 
-	private void create(String filename) {
-		InputStream input = getClass().getResourceAsStream(filename);
-		if (input == null) {
+	private void create() {
 			FileOutputStream output = null;
 			try {
-				out.getParentFile().mkdirs();
-				output = new FileOutputStream(out);
+				classFullPath.getParentFile().mkdirs();
+				output = new FileOutputStream(classFullPath);
 				byte[] buf = new byte[8192];
 				int length;
 				while ((length = input.read(buf)) > 0) {
@@ -92,7 +74,7 @@ public abstract class ConfigUtils {
 			} catch (Exception e) {
 			} finally {
 				try {
-					input.close();
+					//input.close();
 				} catch (Exception ignored) {
 				}
 				try {
@@ -101,39 +83,13 @@ public abstract class ConfigUtils {
 				} catch (Exception ignored) {
 				}
 			}
-		}
-	}
-
-	private void create(InputStream input) {
-		if (input != null) {
-			FileOutputStream output = null;
-			try {
-				output = new FileOutputStream(out);
-				byte[] buf = new byte[8192];
-				int length;
-				while ((length = input.read(buf)) > 0) {
-					output.write(buf, 0, length);
-				}
-			} catch (Exception e) {
-			} finally {
-				try {
-					input.close();
-				} catch (Exception ignored) {
-				}
-				try {
-					if (output != null)
-						output.close();
-				} catch (Exception ignored) {
-				}
-			}
-		}
 	}
 
 	private HashMap<String, String> loadHashMap() {
 		HashMap<String, String> result = new HashMap<String, String>();
 		BufferedReader br = null;
 		try {
-			br = new BufferedReader(new FileReader(out));
+			br = new BufferedReader(new FileReader(classFullPath));
 			String line;
 			while ((line = br.readLine()) != null) {
 				if ((line.isEmpty()) || (line.startsWith("#")) || (!line.contains(": ")))
@@ -163,8 +119,7 @@ public abstract class ConfigUtils {
 				HashMap<String, String> contents = loadHashMap();
 				return contents.get(property);
 			}
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		return null;
 	}
 
@@ -216,14 +171,14 @@ public abstract class ConfigUtils {
 		return null;
 	}
 
-	public Boolean checkProperty(String property) {
+	public Boolean checkProperty(String key) {
 		String check;
 		try {
-			if (cached)
-				check = cache.get(property);
-			else {
-				HashMap<String, String> contents = this.loadHashMap();
-				check = contents.get(property);
+                    if (cached){
+        		check = cache.get(key);
+                    } else {
+                        HashMap<String, String> contents = this.loadHashMap();
+			check = contents.get(key);
 			}
 			if (check != null)
 				return true;
@@ -236,9 +191,9 @@ public abstract class ConfigUtils {
 
 	private void flush(HashMap<Integer, String> newContents) {
 		try {
-			this.delFile(out);
-			out.createNewFile();
-			BufferedWriter writer = new BufferedWriter(new FileWriter(out));
+			this.delFile(classFullPath);
+			classFullPath.createNewFile();
+			BufferedWriter writer = new BufferedWriter(new FileWriter(classFullPath));
 			for (int i = 1; i <= newContents.size(); i++) {
 				String line = newContents.get(i);
 				if (line == null || line.split(": ").length == 1) {
@@ -267,7 +222,7 @@ public abstract class ConfigUtils {
 		BufferedReader br = null;
 		Integer i = 1;
 		try {
-			br = new BufferedReader(new FileReader(out));
+			br = new BufferedReader(new FileReader(classFullPath));
 			String line;
 			while ((line = br.readLine()) != null) {
 				if (line.isEmpty()) {

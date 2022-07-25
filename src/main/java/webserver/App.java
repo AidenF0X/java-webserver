@@ -2,6 +2,7 @@ package webserver;
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import webserver.handler.DocrootHandler;
 import webserver.handler.ServerInfoHandler;
 import webserver.server.WebServer;
@@ -16,12 +17,14 @@ import java.util.List;
 import webserver.config.ConfigOptions;
 import static webserver.config.ConfigOptions.getWorkdir;
 import webserver.config.ConfigUtils;
+import webserver.handler.TesHandler;
 
 public class App {
 
 	private static final Logger LOG = LoggerFactory.getLogger(App.class);
         public static ConfigUtils config;
-        public static ConfigOptions cfo = new ConfigOptions();
+        public static ConfigUtils cftes;
+        public static ConfigOptions cfo;
         private static final String cfgName = "main.cfg";
         private static final String cfgPath = "config" + File.separator + cfgName;
 	private App() {}
@@ -32,8 +35,13 @@ public class App {
 	 * @param args String array of command line arguments
 	 */
 	public static void main(String[] args) {
-                config = new ConfigUtils(cfgName, new File(getWorkdir(3) + cfgPath)) {};
+                config = new ConfigUtils(new File(getWorkdir(3) + cfgPath), "config.json"){};
                 config.load();
+                cfo = new ConfigOptions();
+               
+                /*
+                cftes = new ConfigUtils(new File(getWorkdir(3) + "config" + File.separator + "gg.cfg"), "tes.json"){};
+                cftes.load(); */
 		CommandLineOptions options = new CommandLineOptions(args);
 
 		// If the help options is set, print usage and exit.
@@ -50,7 +58,8 @@ public class App {
 		// Configure request handlers
 		RequestHandler serverInfoHandler = new ServerInfoHandler(port, timeout, maxThreads, docroot, System.currentTimeMillis());
 		RequestHandler docrootHandler = new DocrootHandler(docroot, Collections.singletonList(cfo.getPropertyString("indexFile")), cfo.getPropertyBoolean("directoryListing"));
-		List<RequestHandler> requestHandlers = Arrays.asList(serverInfoHandler, docrootHandler);
+                TesHandler TesHandler = new TesHandler("WP");
+		List<RequestHandler> requestHandlers = Arrays.asList(serverInfoHandler, docrootHandler, TesHandler);
 		// Create the server
 		WebServer server = new WebServer(port, timeout, maxThreads, requestHandlers);
 		// Register a shutdown hook to gracefully stop the server when the JVM is terminated

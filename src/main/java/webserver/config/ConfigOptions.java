@@ -18,21 +18,28 @@ import static webserver.App.config;
  * @author AidenFox
  */
 public class ConfigOptions {
+    
+    private static ConfigUtils configInstance;
+    
+    public ConfigOptions(){
+        //this.configInstance = configInstance;
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfigOptions.class);
     
-    public static void setDefaults(String jsonFile) throws IOException {
+    public static void setDefaults(File classFullPath, String jsonFile) throws IOException {
+            LOG.info("  - Filling " + classFullPath + " file, with " + jsonFile + " contents");
             ObjectMapper mapper = new ObjectMapper(); 
             InputStream is = getResourceAsStream(jsonFile);
             TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
-
             HashMap<String,Object> map = mapper.readValue(is, typeRef); 
+ 
             for(Map.Entry<String, Object> entry : map.entrySet()){
-                String key = entry.getKey();
-                Object value = entry.getValue();
-                ConfigOptions.setProperty(key, value);
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    setProperty(key, value);
             }
-            ConfigOptions.setProperty("created", new Date());
+                setProperty("created", new Date());
     }  
     
     public static void setProperty(String key, Object value) {

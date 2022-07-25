@@ -1,6 +1,6 @@
 {
     "port": 8080,
-    "htdocs": "./www",
+    "htdocs": "www",
     "indexFile": "index.html",
     "directoryListing": true,
     "maxThreads": 20,
