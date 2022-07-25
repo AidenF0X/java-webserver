@@ -1,6 +1,8 @@
 {
     "port": 8080,
     "htdocs": "./www",
+    "indexFile": "index.html",
+    "directoryListing": true,
     "maxThreads": 20,
     "defaultTimeout": 10
 }
