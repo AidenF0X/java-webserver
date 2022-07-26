@@ -16,7 +16,6 @@ import java.util.List;
 import webserver.config.ConfigOptions;
 import static webserver.config.ConfigOptions.getWorkdir;
 import webserver.config.ConfigUtils;
-import webserver.handler.TesHandler;
 
 public class App {
 
@@ -47,9 +46,8 @@ public class App {
 		String docroot = options.docroot();
 		// Configure request handlers
 		RequestHandler serverInfoHandler = new ServerInfoHandler(port, timeout, maxThreads, docroot, System.currentTimeMillis());
-		RequestHandler docrootHandler = new DocrootHandler(docroot, Collections.singletonList(cfo.getPropertyString("indexFile")), cfo.getPropertyBoolean("directoryListing"));
-                TesHandler TesHandler = new TesHandler("WP");
-		List<RequestHandler> requestHandlers = Arrays.asList(serverInfoHandler, docrootHandler, TesHandler);
+		RequestHandler docrootHandler = new DocrootHandler(docroot, Collections.singletonList((String) cfo.getProperty("indexFile", "String")),(Boolean) cfo.getProperty("directoryListing", "Bool"));
+		List<RequestHandler> requestHandlers = Arrays.asList(serverInfoHandler, docrootHandler);
 		// Create the server
 		WebServer server = new WebServer(port, timeout, maxThreads, requestHandlers);
 		// Register a shutdown hook to gracefully stop the server when the JVM is terminated

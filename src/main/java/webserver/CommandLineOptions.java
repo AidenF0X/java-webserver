@@ -14,22 +14,22 @@ public class CommandLineOptions {
 	/**
 	 * Default port the web server will be bound.
 	 */
-	private static final int DEFAULT_PORT = cfo.getPropertyInt("port");
+	private static final int DEFAULT_PORT = (int) cfo.getProperty("port", "Int");
 
 	/**
 	 * Default document root used.
 	 */
-	private static final String DEFAULT_DOCROOT = cfo.getPropertyString("htdocs");
+	private static final String DEFAULT_DOCROOT = (String) cfo.getProperty("htdocs", "String");
 
 	/**
 	 * Default max number of worker threads.
 	 */
-	private static final int DEFAULT_MAX_THREADS = cfo.getPropertyInt("maxThreads");
+	private static final int DEFAULT_MAX_THREADS = (int) cfo.getProperty("maxThreads", "Int");
 
 	/**
 	 * Default request timeout.
 	 */
-	private static final int DEFAULT_TIMEOUT = cfo.getPropertyInt("defaultTimeout");
+	private static final int DEFAULT_TIMEOUT = (int) cfo.getProperty("defaultTimeout", "Int");
 	private final OptionSpec<Integer> timeout;
 	private final OptionSpec<Integer> maxThreads;
 	private final OptionSpec<Void> help;
